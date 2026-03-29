@@ -2,7 +2,7 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 
-// Use Vercel's writable /tmp folder
+// Use Vercel's writable folder
 const uploadPath = path.join("/tmp", "uploads");
 
 // Create folder if it doesn't exist
@@ -11,10 +11,10 @@ if (!fs.existsSync(uploadPath)) {
 }
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     cb(null, uploadPath);
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     const uniqueName = Date.now() + "-" + file.originalname;
     cb(null, uniqueName);
   }
