@@ -1,6 +1,6 @@
 import {generateResumeImprovement} from "../configs/ai.js";
 import Resume from "../models/Resume.js";
-import imagekit from "../configs/imagekit.js";
+import imagekit from "../configs/imageKit.js";
 // controller for enhancing resume professional summary
 // POST: /api/ai/enhance-pro-sum
 export const enhanceProfessionalSummary = async (req, res) => {
