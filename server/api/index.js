@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(cors({ origin: "*" }));
 
 // ✅ Routes
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Server is live...");
 });
 
