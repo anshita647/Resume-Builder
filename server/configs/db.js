@@ -4,7 +4,7 @@ import dns from "dns";
 
 dotenv.config();
 
-// Keep this (it's fine)
+// DNS fix (optional, keep it)
 if (process.env.NODE_ENV !== "production") {
   try {
     dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -21,10 +21,15 @@ const connectDB = async () => {
 
     await mongoose.connect(process.env.MONGODB_URI);
 
-    console.log(" MongoDB connected successfully");
+    console.log("✅ MongoDB connected successfully");
   } catch (error) {
-    console.error("MongoDB connection failed:", error.message);
-    process.exit(1);
+    console.error("❌ MongoDB connection failed:", error.message);
+
+    // ❌ REMOVE THIS:
+    // process.exit(1);
+
+    // ✅ Instead:
+    throw error;   // let Vercel handle it properly
   }
 };
 
