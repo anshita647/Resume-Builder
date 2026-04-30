@@ -8,12 +8,19 @@ if (!cached) {
   cached = global._mongoose = { conn: null };
 }
 
-const handler = async (req, res) => {
-  if (!cached.conn) {
-    cached.conn = await connectDB();
+// ✅ create once (important)
+const serverlessHandler = serverless(app);
+
+export default async function handler(req, res) {
+  try {
+    if (!cached.conn) {
+      cached.conn = await connectDB();
+      console.log("✅ MongoDB connected");
+    }
+
+    return serverlessHandler(req, res); // ✅ reuse
+  } catch (error) {
+    console.error("Handler Error:", error);
+    return res.status(500).json({ error: "Server error" });
   }
-
-  return serverless(app)(req, res); // ✅ correct usage
-};
-
-export default handler;
+}
