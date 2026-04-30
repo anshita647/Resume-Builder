@@ -4,7 +4,6 @@ import dns from "dns";
 
 dotenv.config();
 
-// DNS fix (optional, keep it)
 if (process.env.NODE_ENV !== "production") {
   try {
     dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -13,24 +12,32 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
+// ✅ GLOBAL CACHE
+let cached = global._mongoose;
+
+if (!cached) {
+  cached = global._mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
-  try {
+  if (cached.conn) {
+    return cached.conn; // ✅ reuse existing connection
+  }
+
+  if (!cached.promise) {
     if (!process.env.MONGODB_URI) {
       throw new Error("MONGODB_URI not set");
     }
 
-    await mongoose.connect(process.env.MONGODB_URI);
-
-    console.log("✅ MongoDB connected successfully");
-  } catch (error) {
-    console.error("❌ MongoDB connection failed:", error.message);
-
-    // ❌ REMOVE THIS:
-    // process.exit(1);
-
-    // ✅ Instead:
-    throw error;   // let Vercel handle it properly
+    cached.promise = mongoose.connect(process.env.MONGODB_URI)
+      .then((mongooseInstance) => {
+        console.log("✅ MongoDB connected");
+        return mongooseInstance;
+      });
   }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
 };
 
 export default connectDB;

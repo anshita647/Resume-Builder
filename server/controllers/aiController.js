@@ -1,6 +1,7 @@
-import {generateResumeImprovement} from "../configs/ai.js";
+import { generateResumeImprovement } from "../configs/ai.js";
 import Resume from "../models/Resume.js";
 import imagekit from "../configs/imageKit.js";
+
 // controller for enhancing resume professional summary
 // POST: /api/ai/enhance-pro-sum
 export const enhanceProfessionalSummary = async (req, res) => {
@@ -21,7 +22,13 @@ Do not add new information. Only improve the language.
 ${userContent}
 `;
 
-    const enhancedContent = await generateResumeImprovement(prompt);
+    // ✅ FIX: add timeout
+    const enhancedContent = await Promise.race([
+      generateResumeImprovement(prompt),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("AI timeout")), 8000)
+      ),
+    ]);
 
     return res.status(200).json({ enhancedContent });
   } catch (error) {
@@ -51,7 +58,13 @@ Do not add new information.
 ${userContent}
 `;
 
-    const enhancedContent = await generateResumeImprovement(prompt);
+    // ✅ FIX: add timeout
+    const enhancedContent = await Promise.race([
+      generateResumeImprovement(prompt),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("AI timeout")), 8000)
+      ),
+    ]);
 
     return res.status(200).json({ enhancedContent });
   } catch (error) {
@@ -103,7 +116,7 @@ Provide the output strictly in valid JSON format with the following structure:
       "isCurrent": Boolean
     }
   ],
-  "professionalSummary": [
+  "projects": [
     {
       "name": String,
       "type": String,
@@ -122,19 +135,28 @@ Provide the output strictly in valid JSON format with the following structure:
 }
 `;
 
-  let extractedData;
-let parsedData;
+    let extractedData;
+    let parsedData;
 
-try {
-  extractedData = await generateResumeImprovement(prompt);
-} catch (error) {
-  return res.status(500).json({ message: "AI failed" });
-}
+    try {
+      // ✅ FIX: timeout added
+      extractedData = await Promise.race([
+        generateResumeImprovement(prompt),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("AI timeout")), 8000)
+        ),
+      ]);
+
+      // ✅ FIX: parse JSON properly
+      parsedData = JSON.parse(extractedData);
+    } catch (error) {
+      return res.status(500).json({ message: "AI failed or invalid JSON" });
+    }
 
     const updatedResume = await Resume.findByIdAndUpdate(
       resumeId,
       parsedData,
-      {returnDocument: "after" }
+      { returnDocument: "after" }
     );
 
     if (!updatedResume) {
@@ -146,37 +168,44 @@ try {
       message: "Resume updated successfully",
     });
   } catch (error) {
-   
     return res.status(500).json({
       message: error.message,
     });
   }
 };
+
 // controller for uploading image to ImageKit
 // POST: /api/ai/upload-image
 export const uploadImage = async (req, res) => {
   try {
     const file = req.file;
-    console.log("STEP 1: req.file →", req.file); // ✅ LINE 1
+    console.log("STEP 1: req.file →", req.file);
 
     if (!file) {
-            console.log("STEP 2: No file received"); // ✅ LINE 2
+      console.log("STEP 2: No file received");
       return res.status(400).json({ message: "No file uploaded" });
     }
-    console.log("STEP 3: Uploading to ImageKit..."); // ✅ LINE 3
 
-    const result = await imagekit.files.upload({
-      file: file.buffer.toString("base64"), // ✅ FIXED
-      fileName: file.originalname,
-    });
-    console.log("STEP 4: ImageKit result →", result); // ✅ LINE 4
+    console.log("STEP 3: Uploading to ImageKit...");
+
+    // ✅ FIX: timeout added
+    const result = await Promise.race([
+      imagekit.files.upload({
+        file: file.buffer.toString("base64"),
+        fileName: file.originalname,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Upload timeout")), 8000)
+      ),
+    ]);
+
+    console.log("STEP 4: ImageKit result →", result);
 
     return res.status(200).json({
       url: result.url,
     });
-
   } catch (error) {
-        console.error("STEP 5: ERROR →", error); // ✅ LINE 5
+    console.error("STEP 5: ERROR →", error);
 
     return res.status(500).json({
       message: error.message,

@@ -5,20 +5,15 @@ import connectDB from "../configs/db.js";
 let cached = global._mongoose;
 
 if (!cached) {
-  cached = global._mongoose = { conn: null, promise: null };
+  cached = global._mongoose = { conn: null };
 }
 
 const handler = async (req, res) => {
-  try {
-    if (!cached.conn) {
-      cached.conn = await connectDB();
-    }
-
-    return app(req, res);
-  } catch (err) {
-    console.error("API Error:", err);
-    return res.status(500).json({ error: "Server Error" });
+  if (!cached.conn) {
+    cached.conn = await connectDB();
   }
+
+  return serverless(app)(req, res); // ✅ correct usage
 };
 
-export default serverless(handler);
+export default handler;
