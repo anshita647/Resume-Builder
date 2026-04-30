@@ -10,8 +10,7 @@ import aiRouter from "./routes/aiRoutes.js";
 
 const app = express();
 
-// connect DB
-connectDB();
+
 
 app.use(express.json());
 
