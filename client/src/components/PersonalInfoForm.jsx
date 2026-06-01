@@ -98,7 +98,7 @@ let finalImageSrc = imageSrc;
   formData.append("file", file);
 
   try {
-    const res = await fetch("http://localhost:3000/api/ai/upload-image", {
+    const res = await fetch("https://resume-builder-backend-8620.onrender.com/api/ai/upload-image", {
       method: "POST",
       body: formData,
     });
