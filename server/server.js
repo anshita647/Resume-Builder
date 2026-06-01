@@ -25,8 +25,19 @@ app.get("/", (req, res) => {
 });
 
 // Routes
+// Routes
 app.use("/api/users", userRouter);
 app.use("/api/resumes", resumeRouter);
 app.use("/api/ai", aiRouter);
 
-export default app;
+const PORT = process.env.PORT || 5000;
+
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Database connection failed:", err);
+  });
