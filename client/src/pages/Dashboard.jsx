@@ -39,7 +39,7 @@ const Dashboard = () => {
   // Load all resumes from backend
   const loadAllResumes = async () => {
     try {
-      const { data } = await api.get("/api/users/resumes", {
+      const { data } = await api.get("/users/resumes", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -66,7 +66,7 @@ const Dashboard = () => {
       if (!title.trim()) return toast.error("Title is required");
 
       const { data } = await api.post(
-        "/api/resumes/create",
+        "/resumes/create",
         { title },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -96,7 +96,7 @@ const Dashboard = () => {
       const resumeText = await pdftoText(resumeFile);
 
       const createResponse = await api.post(
-        "/api/resumes/create",
+        "/resumes/create",
         { title },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -109,7 +109,7 @@ const Dashboard = () => {
       }
 
       await api.put(
-        `/api/ai/update-resume/${resumeId}`,
+        `/ai/update-resume/${resumeId}`,
         { resumeText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -139,7 +139,7 @@ const Dashboard = () => {
   const saveEdit = async () => {
     try {
       const { data } = await api.put(
-        `/api/resumes/update/${selectedResume._id}`,
+        `/resumes/update/${selectedResume._id}`,
         { title: editTitle },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -167,7 +167,7 @@ const Dashboard = () => {
 
     if (window.confirm(`Delete "${resume.title}"?`)) {
       try {
-        await api.delete(`/api/resumes/${resume._id}`, {
+        await api.delete(`/resumes/${resume._id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -216,7 +216,7 @@ const Dashboard = () => {
     }
 
     const { data } = await api.put(
-      `/api/resumes/update/${resumeData._id}`,
+      `/resumes/update/${resumeData._id}`,
       formData,
       {
         headers: {
