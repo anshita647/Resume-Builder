@@ -64,7 +64,7 @@ accentColor: "#3b82f6",
     const fetchResume = async () => {
       setLoading(true);
       try {
-      const { data } = await api.get(`/api/resumes/get/${resumeid}`, {
+      const { data } = await api.get(`/resumes/get/${resumeid}`, {
   headers: { Authorization: `Bearer ${token}` }
 });
 
@@ -108,7 +108,7 @@ accentColor: resume.accentColor|| "#3b82f6",
   const changeResumeVisibility = async () => {
     try {
       const { data } = await api.put(
-      `/api/resumes/update/${resumeData._id}`, // ✅ Add resumeId here
+      `/resumes/update/${resumeData._id}`, // ✅ Add resumeId here
         {
           resumeId: resumeData._id,
           resumeData: { isPublic: !resumeData.isPublic },
