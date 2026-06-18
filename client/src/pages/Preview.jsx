@@ -14,7 +14,7 @@ const Preview = () => {
   useEffect(() => {
     const loadResume = async () => {
       try {
-        const{data}=await api.get(`/api/resumes/public/${resumeid}`);
+        const{data}=await api.get(`/resumes/public/${resumeid}`);
         setResumeData(data.resume);
       } catch (error) {
         console.error("Failed to load resume:", error);
